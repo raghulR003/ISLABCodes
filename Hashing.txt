@@ -1,0 +1,29 @@
+import java.util.*;
+
+public class Hashing{
+
+    public static String XOROperation(String msg, String key){
+        int keyLen=key.length();
+        String encryptedMsg="";
+        for(int i=0;i<msg.length();i++){
+            char CH=msg.charAt(i);
+            char XCH=key.charAt(i%keyLen);
+            char combo=(char)(CH^XCH);
+            encryptedMsg+=combo;
+        }
+        return encryptedMsg;
+    }
+    public static void main(String[] args){
+        Scanner sc=new Scanner(System.in);
+        System.out.print("Enter the message: ");
+        String msg=sc.nextLine();
+        System.out.print("Enter the key: ");
+        String key=sc.nextLine();
+        int HashCodeGen=msg.hashCode();
+        String concatenatedMsg=msg+":-:"+HashCodeGen;
+        System.out.println("The concatenated message is: "+concatenatedMsg);
+        String encryptedMsg=XOROperation(concatenatedMsg,key);
+        System.out.println("The encrypted message is: "+encryptedMsg);
+        String decryptedMsg=XOROperation(encryptedMsg, key);
+    }
+}

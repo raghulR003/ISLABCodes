@@ -1,0 +1,71 @@
+import java.util.Scanner;
+public class DoubleEncandDec {
+    public static void main(String[] args){
+        Scanner sc=new Scanner(System.in);
+        System.out.print("Enter the message: ");
+        String msg=sc.nextLine();
+        System.out.print("Enter the key: ");
+        String key=sc.nextLine();
+        //1. Encryption using Caesar Cipher
+        String CaesarEncrypted=CaesarEncryption(msg);
+        System.out.println("Result of Caesar Cipher Encryption: "+CaesarEncrypted);
+        //2. Encrypt using XOR Cipher
+        String XOREncrypted=XOREncryption(CaesarEncrypted,key);
+        System.out.println("Result of XOR Encryption: "+XOREncrypted);
+        //3. Decrypt using XOR Cipher
+        System.out.println("Result of XOR Decryption: "+XOREncryption(XOREncrypted,key));
+        //4. Decrypt using Caesar Cipher
+        System.out.println("Result of Caesar Cipher decryption: "+CaesarDecryption(XOREncryption(XOREncrypted,key)));
+    }
+
+    public static String CaesarEncryption(String msg){
+        String encryption="";
+        for(int i=0;i<msg.length();i++){
+            char ch=msg.charAt(i);
+            if(Character.isUpperCase(ch)){
+                int n=(int)ch;
+                n=(n-'A'+3)%26+'A';
+                encryption=encryption+(char)n;
+            }
+            else if(Character.isLowerCase(ch)){
+                int n=(int)ch;
+                n=(n-'a'+3)%26+'a';
+                encryption=encryption+(char)n;
+            }
+            else encryption=encryption+ch;
+        }
+        return encryption;
+    }
+
+    public static String XOREncryption(String msg, String key){
+        String rtMsg="";
+        int keyLength=key.length();
+        for(int i=0;i<msg.length();i++){
+            char CH=msg.charAt(i);
+            char XCH=key.charAt(i%keyLength);
+            char combo=(char)(CH^XCH);
+            rtMsg+=combo;
+        }
+        return rtMsg;
+    }
+
+
+public static String CaesarDecryption(String msg){
+        String decryption="";
+        for(int i=0;i<msg.length();i++){
+            char ch=msg.charAt(i);
+            if(Character.isUpperCase(ch)){
+                int n=(int)ch;
+                n=(n-'A'-3+26)%26+'A';
+                decryption=decryption+(char)n;
+            }
+            else if(Character.isLowerCase(ch)){
+                int n=(int)ch;
+                n=(n-'a'-3+26)%26+'a';
+                decryption=decryption+(char)n;
+            }
+            else decryption=decryption+ch;
+        }
+        return decryption;
+    }
+}

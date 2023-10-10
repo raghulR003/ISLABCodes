@@ -1,0 +1,28 @@
+import java.util.Scanner;
+
+public class Bruteforceattack {
+    public static void main(String[] args){
+        Scanner sc=new Scanner(System.in);
+        System.out.println("Enter the encrypted message: ");
+        String str=sc.nextLine();
+
+        for(int k=1;k<=26;k++){
+            String decryptedMsg="";
+            for(int i=0;i<str.length();i++){
+                char ch=str.charAt(i);
+                if(Character.isUpperCase(ch)){
+                    int n=(int)ch;
+                    n=(n-'A'-k+26)%26+'A';
+                    decryptedMsg=decryptedMsg+(char)n;
+                }
+                else if (Character.isLowerCase(ch)){
+                    int n=(int)ch;
+                    n=(n-'a'-k+26)%26+'a';
+                    decryptedMsg=decryptedMsg+(char)n;
+                }
+                else decryptedMsg=decryptedMsg+ch;
+            }
+            System.out.println(k+" : "+decryptedMsg);
+        }
+    }
+}

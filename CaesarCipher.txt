@@ -1,0 +1,48 @@
+import java.util.Scanner;
+
+public class CaesarCipher {
+    public static void main(String[] args){
+        Scanner sc=new Scanner(System.in);
+        System.out.print("Enter the message to be encrypted: ");
+        String str=sc.nextLine();
+        String encryptedText="";
+
+        //Encryption procedure, stored in encryptedText
+        for(int i=0;i<str.length();i++){
+            char ch=str.charAt(i);
+            if(Character.isUpperCase(ch)){
+                int n=(int)ch;
+                n=(n-'A'+3)%26+'A';
+                encryptedText=encryptedText+(char)n;
+            }
+            else if(Character.isLowerCase(ch)){
+                int n=(int)ch;
+                n=(n-'a'+3)%26+'a';
+                encryptedText=encryptedText+(char)n;
+            }
+            else encryptedText=encryptedText+ch;
+        }
+
+        System.out.println("The encrypted text is: "+encryptedText);
+
+        String decryptedText="";
+
+        //Decryption procedure, stored in decryptedText
+        for(int i=0;i<encryptedText.length();i++){
+            char ch=encryptedText.charAt(i);
+            if(Character.isUpperCase(ch)){
+                int n=(int)ch;
+                n=(n-'A'-3+26)%26+'A';
+                decryptedText=decryptedText+(char)n;
+            }
+            else if(Character.isLowerCase(ch)){
+                int n=(int)ch;
+                n=(n-'a'-3+26)%26+'a';
+                decryptedText=decryptedText+(char)n;
+            }
+            else decryptedText=decryptedText+ch;
+        }
+
+        System.out.println("The decrypted text is: "+decryptedText);
+    }
+}

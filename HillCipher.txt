@@ -1,0 +1,167 @@
+import java.util.Scanner;
+
+public class HillCipher {
+    public static int[][] getKeyMatrix(int size) {
+        Scanner scanner = new Scanner(System.in);
+        int[][] keyMatrix = new int[size][size];
+        System.out.println("Enter the key matrix :");
+        for (int i = 0; i < size; i++) {
+            String[] rowValues = scanner.nextLine().trim().split(" ");
+            if (rowValues.length != size) {
+                System.out.println("Invalid key matrix dimensions.");
+                System.exit(1);
+            }
+            for (int j = 0; j < size; j++) {
+                keyMatrix[i][j] = Integer.parseInt(rowValues[j]);
+            }
+        }
+        return keyMatrix;
+    }
+
+public static int[][] getInverseKeyMatrix(int[][] keyMatrix) {
+int size = keyMatrix.length;
+int determinant = determinant(keyMatrix, size);
+int inverseDeterminant = findModularInverse(determinant, 26);
+if (inverseDeterminant == -1) {
+System.out.println("Inverse key matrix does not exist.");
+System.exit(1);
+}
+int[][] adjointMatrix = adjoint(keyMatrix, size);
+int[][] inverseMatrix = new int[size][size];
+for (int i = 0; i < size; i++) {
+for (int j = 0; j < size; j++) {
+inverseMatrix[i][j] = (adjointMatrix[i][j] * inverseDeterminant) % 26;
+if (inverseMatrix[i][j] < 0) {
+inverseMatrix[i][j] += 26;
+}
+}
+
+}
+return inverseMatrix;
+}
+
+    public static int findModularInverse(int a, int m) {
+        for (int x = 1; x < m; x++) {
+            if ((a * x) % m == 1) {
+                return x;
+            }
+        }
+        return -1; // Inverse doesn't exist
+    }
+
+    public static int determinant(int[][] matrix, int size) {
+        if (size == 1) {
+            return matrix[0][0];
+        }
+        if (size == 2) {
+            return (matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0] + 26) % 26;
+        }
+        int det = 0;
+        for (int col = 0; col < size; col++) {
+            int[][] subMatrix = new int[size - 1][size - 1];
+            for (int i = 1; i < size; i++) {
+                int subMatrixCol = 0;
+                for (int j = 0; j < size; j++) {
+                    if (j != col) {
+                        subMatrix[i - 1][subMatrixCol] = matrix[i][j];
+                        subMatrixCol++;
+                    }
+                }
+            }
+            int sign = (col % 2 == 0) ? 1 : -1;
+            det = (det + sign * matrix[0][col] * determinant(subMatrix, size - 1)) % 26;
+        }
+        if (det < 0) {
+            det += 26;
+        }
+        return det;
+    }
+
+public static int[][] adjoint(int[][] matrix, int size) {
+int[][] adjointMatrix = new int[size][size];
+for (int i = 0; i < size; i++) {
+for (int j = 0; j < size; j++) {
+
+int[][] subMatrix = new int[size - 1][size - 1];
+int subMatrixRow = 0;
+int subMatrixCol = 0;
+for (int m = 0; m < size; m++) {
+for (int n = 0; n < size; n++) {
+if (m != i && n != j) {
+subMatrix[subMatrixRow][subMatrixCol] = matrix[m][n];
+subMatrixCol++;
+if (subMatrixCol == size - 1) {
+subMatrixRow++;
+subMatrixCol = 0;
+}
+}
+}
+}
+int sign = ((i + j) % 2 == 0) ? 1 : -1;
+adjointMatrix[j][i] = (sign * determinant(subMatrix, size - 1) + 26) % 26;
+}
+}
+return adjointMatrix;
+}
+
+public static String encrypt(String plaintext, int[][] keyMatrix) {
+int size = keyMatrix.length;
+int blockSize = size;
+StringBuilder ciphertext = new StringBuilder();
+while (plaintext.length() % blockSize != 0) {
+plaintext += 'X';
+}
+for (int i = 0; i < plaintext.length(); i += blockSize) {
+int[] block = new int[blockSize];
+for (int j = 0; j < blockSize; j++) {
+block[j] = plaintext.charAt(i + j) - 'A';
+}
+for (int j = 0; j < size; j++) {
+int sum = 0;
+for (int k = 0; k < size; k++) {
+sum += keyMatrix[j][k] * block[k];
+}
+ciphertext.append((char) ((sum % 26) + 'A'));
+}
+}
+return ciphertext.toString();
+
+}
+
+    public static String decrypt(String ciphertext, int[][] inverseKeyMatrix) {
+        int size = inverseKeyMatrix.length;
+        int blockSize = size;
+        StringBuilder plaintext = new StringBuilder();
+        for (int i = 0; i < ciphertext.length(); i += blockSize) {
+            int[] block = new int[blockSize];
+            for (int j = 0; j < blockSize; j++) {
+                block[j] = ciphertext.charAt(i + j) - 'A';
+            }
+            for (int j = 0; j < size; j++) {
+                int sum = 0;
+                for (int k = 0; k < size; k++) {
+                    sum += inverseKeyMatrix[j][k] * block[k];
+                }
+                plaintext.append((char) ((sum % 26) + 'A'));
+            }
+        }
+        return plaintext.toString();
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter the size of the key matrix: ");
+        int size = scanner.nextInt();
+        scanner.nextLine(); // Consume the newline character
+        int[][] keyMatrix = getKeyMatrix(size);
+        int[][] inverseKeyMatrix = getInverseKeyMatrix(keyMatrix);
+        System.out.print("Enter the plaintext (letters only): ");
+        String plaintext = scanner.nextLine();
+        plaintext = plaintext.toUpperCase();
+        String ciphertext = encrypt(plaintext, keyMatrix);
+        System.out.println("Encrypted ciphertext: " + ciphertext);
+        int l = plaintext.length();
+        String decryptedText = decrypt(ciphertext, inverseKeyMatrix).substring(0, l);
+        System.out.println("Decrypted plaintext: " + decryptedText);
+    }
+}

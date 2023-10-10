@@ -1,0 +1,51 @@
+import java.util.*;
+import java.math.*;
+
+public class RSA {
+
+    public static int gcd(int e, int n){
+        if(e==0) return n;
+        else return gcd(n%e,e);
+    }
+    public static void main(String args[]){
+        Scanner sc=new Scanner(System.in);
+        //1. Take two prime numbers
+        int p=53,q=59;
+        System.out.println("1. Prime numbers chosen are "+p+" and "+q);
+        //2. Multiply both to get first part of public key
+        int n=p*q;
+        System.out.println("2. The first part of public key: "+n);
+        //3. Computing totient of n
+        int tot_n=(p-1)*(q-1);
+        System.out.println("3. The totient of n is: "+tot_n);
+        //4. Calculate a value e such that gcd(e,tot_n)=1
+        int e=0;
+        for(e=2;e<tot_n;e++){
+            if(gcd(e,tot_n)==1){
+                break;
+            }
+        }
+        System.out.println("4. The value e [PUBLIC] is: "+e);
+        //5. Find a d such that e*d mod(tot_n)=1
+        int d=0;
+        for(d=2;;d++){
+            int val=(e*d)%tot_n;
+            if(val==1)
+            break;
+        }
+        System.out.println("5. The d value [PRIVATE] is: "+d);
+
+        System.out.println();
+        System.out.print("Enter message to be transmitted: ");
+        int msg=sc.nextInt();
+        double enc=(Math.pow(msg,e))%n;
+        System.out.println("Encrypted Message: "+enc);
+
+        BigInteger msgback;
+        BigInteger N=BigInteger.valueOf(n);
+        BigInteger ENC=BigDecimal.valueOf(enc).toBigInteger();
+        msgback=(ENC.pow(d)).mod(N);
+
+        System.out.println("Decrypted Message: "+msgback);
+    }
+}

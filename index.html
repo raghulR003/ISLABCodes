@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Copy Text from Files to Clipboard</title>
+</head>
+<body>
+    <p><a href="#" onclick="copyTextFromFile('CaesarCipher.txt')">CaesarCipher.txt</a></p>
+    <p><a href="#" onclick="copyTextFromFile('ShiftCipher.txt')">ShiftCipher.txt</a></p>
+    <p><a href="#" onclick="copyTextFromFile('Bruteforceattack.txt')">Bruteforceattack.txt</a></p>
+    <p><a href="#" onclick="copyTextFromFile('RSA.txt')">RSA.txt</a></p>
+    <p><a href="#" onclick="copyTextFromFile('DiffieHellman.txt')">DiffieHellman.txt</a></p>
+    <p><a href="#" onclick="copyTextFromFile('Maninthemiddle.txt')">Maninthemiddle.txt</a></p>
+    <p><a href="#" onclick="copyTextFromFile('HillCipher.txt')">HillCipher.txt</a></p>
+    <p><a href="#" onclick="copyTextFromFile('DoubleEncryptionandDecryption.txt')">DoubleEncryptionandDecryption.txt</a></p>
+    <p><a href="#" onclick="copyTextFromFile('Hashing.txt')">Hashing.txt</a></p>
+
+    <script>
+        function copyTextFromFile(filename) {
+            fetch(filename)
+                .then(response => response.text())
+                .then(text => {
+                    const textArea = document.createElement("textarea");
+                    textArea.value = text;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand("copy");
+                    document.body.removeChild(textArea);
+                    alert(`Copied text from ${filename} to clipboard.`);
+                })
+                .catch(error => {
+                    console.error(`Error fetching or copying text from ${filename}:`, error);
+                    alert(`Error copying text from ${filename}.`);
+                });
+        }
+    </script>
+</body>
+</html>
