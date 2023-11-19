@@ -1,0 +1,58 @@
+import java.util.Scanner;
+
+public class HillCipher {
+    public static int[][] getKeyMatrix(int size) {
+        Scanner scanner = new Scanner(System.in);
+        int[][] keyMatrix = new int[size][size];
+        System.out.println("Enter the key matrix :");
+        for (int i = 0; i < size; i++) {
+            String[] rowValues = scanner.nextLine().trim().split(" ");
+            if (rowValues.length != size) {
+                System.out.println("Invalid key matrix dimensions.");
+                System.exit(1);
+            }
+            for (int j = 0; j < size; j++) {
+                keyMatrix[i][j] = Integer.parseInt(rowValues[j]);
+            }
+        }
+        return keyMatrix;
+    }
+
+public static String encrypt(String plaintext, int[][] keyMatrix) {
+int size = keyMatrix.length;
+int blockSize = size;
+StringBuilder ciphertext = new StringBuilder();
+while (plaintext.length() % blockSize != 0) {
+plaintext += 'X';
+}
+for (int i = 0; i < plaintext.length(); i += blockSize) {
+int[] block = new int[blockSize];
+for (int j = 0; j < blockSize; j++) {
+block[j] = plaintext.charAt(i + j) - 'A';
+}
+for (int j = 0; j < size; j++) {
+int sum = 0;
+for (int k = 0; k < size; k++) {
+sum += keyMatrix[j][k] * block[k];
+}
+ciphertext.append((char) ((sum % 26) + 'A'));
+}
+}
+return ciphertext.toString();
+
+}
+
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter the size of the key matrix: ");
+        int size = scanner.nextInt();
+        scanner.nextLine(); // Consume the newline character
+        int[][] keyMatrix = getKeyMatrix(size);
+        System.out.print("Enter the plaintext (letters only): ");
+        String plaintext = scanner.nextLine();
+        plaintext = plaintext.toUpperCase();
+        String ciphertext = encrypt(plaintext, keyMatrix);
+        System.out.println("Encrypted ciphertext: " + ciphertext);
+    }
+}

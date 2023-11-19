@@ -1,0 +1,30 @@
+1. Open Wireshark, then capture 'TCP' with the proper adapter configuration (or just capture without specifying any filters)
+   Other options are: icmp[0]=0 ; icmp[0:1]=8 ; tcp[13]=18 ; tcp[13]=32 
+2. Do an ipconfig to find the home ip, then do a display filter of: ip.addr == <ip_addr> (optional)
+3. Analyzing endpoints - Statistics > Endpoints, check the number of endpoints captured under each protocol, and can also determine
+   which of the network is resource intensive.
+4. For packet-specific I/O graphs and flow graphs, select a packet, then Statistics > I/O graphs or Flow graphs
+
+5. ARP resolution - 
+    Set initial filter to 'arp' and run suitable network adapter
+    Now, open a CMD and try running: ping 192.0.2.5
+    Several ARP packets must be captured now
+    Click a packet for information > Select ARP request > Target MAC address must be all 0s
+    Now click it's response packet > Select ARP reply > Target MAC address has changed (that's the required MAC address)
+
+6. ICMP analysis - 
+    Run a command like, ping Google.com
+    Now set the display filter to 'icmp'; now the filtered packets will be displayed
+    Take a request and response packet, the change is that the IPv4 Src and Destination ip addresses would have been swapped.
+
+7. HTTPS analysis - 
+    Start capture > Open browser and navigate to a HTTPS website > Stop the capture
+    Now, input 'ssl' in the display filter and note down the first packet's destination address
+    Now input in the display filter: ip.addr == <dest.address> and check the filtered packets
+
+8. TCP analysis - 
+    Ensure network capture is running
+    Enable telnet by running in CMD: pkgmgr /iu:"TelnetClient", then run 'quit' after successful enable
+    To connect: telnet www.google.com 80 (runs in port 80)
+    Now, apply display filter: tcp.port == 80
+    

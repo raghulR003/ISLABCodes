@@ -1,0 +1,74 @@
+package ISCodes;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.AlgorithmParameterSpec;
+import javax.crypto.Cipher;
+import javax.crypto.CipherInputStream;
+import javax.crypto.CipherOutputStream;
+import javax.crypto.KeyGenerator;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
+
+public class DES {
+    private static Cipher encrypt;
+    private static Cipher decrypt;
+    private static final byte[] initialization_vector = {22, 33, 11, 44, 55, 99, 66, 77};
+
+    public static void main(String[] args) {
+        String text = "It is a truth universally acknowledged, that a single man in possession of a good fortune, must be in want of a wife.";
+
+        try {
+            SecretKey secretKey = KeyGenerator.getInstance("DES").generateKey();
+            AlgorithmParameterSpec aps = new IvParameterSpec(initialization_vector);
+            encrypt = Cipher.getInstance("DES/CBC/PKCS5Padding");
+            encrypt.init(Cipher.ENCRYPT_MODE, secretKey, aps);
+            decrypt = Cipher.getInstance("DES/CBC/PKCS5Padding");
+            decrypt.init(Cipher.DECRYPT_MODE, secretKey, aps);
+
+            System.out.println("Original Text:");
+            System.out.println(text);
+
+            byte[] encryptedBytes = encryptText(text.getBytes("UTF-8"));
+            System.out.println("\nEncrypted Text:");
+            System.out.println(new String(encryptedBytes, "ISO-8859-1"));
+
+            byte[] decryptedBytes = decryptText(encryptedBytes);
+            System.out.println("\nDecrypted Text:");
+            System.out.println(new String(decryptedBytes, "UTF-8"));
+
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException |
+                InvalidAlgorithmParameterException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static byte[] encryptText(byte[] input) throws IOException {
+        ByteArrayOutputStream encryptedOutput = new ByteArrayOutputStream();
+        try (OutputStream cipherOutputStream = new CipherOutputStream(encryptedOutput, encrypt)) {
+            cipherOutputStream.write(input);
+        }
+        return encryptedOutput.toByteArray();
+    }
+
+    private static byte[] decryptText(byte[] input) throws IOException {
+        try (ByteArrayInputStream encryptedInput = new ByteArrayInputStream(input);
+             InputStream cipherInputStream = new CipherInputStream(encryptedInput, decrypt);
+             ByteArrayOutputStream decryptedOutput = new ByteArrayOutputStream()) {
+
+            byte[] buffer = new byte[512];
+            int bytesRead;
+            while ((bytesRead = cipherInputStream.read(buffer)) >= 0) {
+                decryptedOutput.write(buffer, 0, bytesRead);
+            }
+            return decryptedOutput.toByteArray();
+        }
+    }
+}

@@ -1,0 +1,19 @@
+Using Firewall Rules - 
+    1. 4 system topology - 3 PCs (1.0.0.1 - 1.0.0.3) and one server (Web server, 1.0.0.4); all connected by a switch
+    2. Access server, then go to Firewall, then proceed to do this:
+            Deny -> ICMP -> Remote IP: 0.0.0.0 -> Wildcard Mask: 255.255.255.255
+            Allow -> IP -> Remote IP: 0.0.0.0 -> Wildcard Mask: 255.255.255.255
+        Save the settings
+    3. Now ping the server, it will not respond. Access to the server's webpage will work.
+
+Using ACLs - 
+    1. Create a topology like this: 
+        4 PCs (10.0.0.1 - 10.0.0.4) --> Switch <----> (10.0.0.5) Router (11.0.1.2) <----> Server (11.0.1.1)
+        Set defualt gateways for PCs and Server properly as defined
+    2. Open the CLI of the router and enter these commands
+            access-list 20 deny 10.0.0.1
+            access-list 20 permit 10.0.0.0 0.0.0.255
+            interface g0/0/0 (router interface facing the PCs)
+            ip access-group 20 in
+            exit
+    3. PC with IP 10.0.0.1 must be denied any access through router, but other PCs can access.

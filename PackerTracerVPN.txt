@@ -1,0 +1,42 @@
+1. Create a network topology as described below:
+
+A sub-topology consisting of two laptops (192.168.10.1 and 192.168.10.2) connected to a switch (switch 1), with default gateway 192.168.10.3, 
+connected to Router 1.
+
+Another sub-topology consisting of two laptops (192.168.11.1 and 192.168.11.2) connected to a switch (switch 2), with default gateway 192.168.11.4, 
+connected to Router 2.
+
+A central router (Router 0) with these configurations:
+Switch 1 <---> Router 1 : 192.168.10.3
+Router 1 <---> Router 0 : 1.0.0.2 <---> 1.0.0.1
+Router 0 <---> Router 2 : 2.0.0.1 <---> 2.0.0.2
+Router 2 <---> Switch 2 : 192.168.11.4
+
+2. Now setup Routing tables at Router 1, 2 and finally 0 such that:
+    Router 1 - ip route 0.0.0.0 0.0.0.0 1.0.0.1
+    Router 2 - ip route 0.0.0.0 0.0.0.0 2.0.0.1
+    Router 3 - ip route 192.168.10.0 255.255.255.0 1.0.0.2
+               ip route 192.168.11.0 255.255.255.0 2.0.0.2
+
+3. Now ping/tracert from one PC in one domain to another PC in another domain. tracert shows routing through Router 0, which is untrusted.
+
+4. Tunnel Configuration - Access Router 1 and then run these commands
+        enable
+        configure terminal
+        interface Tunnel1
+        ip address 172.16.1.1 255.255.0.0
+        tunnel source Gig0/0/1  --- Router 1's outgoing interface (towards Router 0)
+        tunnel destination 2.0.0.2  --- Router 2's incoming IP address (towards Router 0)
+
+    Access Router 2 and then run these commands
+        enable
+        configure terminal
+        interface Tunnel2
+        ip address 172.16.1.2 255.255.0.0
+        tunnel source Gig0/0/1 --- Router 2's outgoing interface (towards Router 0)
+        tunnel destination 1.0.0.2 --- Router 1's incoming IP address (towards Router 0)
+
+5. Now open Router 1's Static table - ip route 192.168.11.0 255.255.255.0 172.16.1.2 (referencing Router2 configurations)
+       open Router 2's Static table - ip route 192.168.10.0 255.255.255.0 172.16.1.1 (referencing Router1 configurations)
+
+6. Now do a tracert through the same as in Step 3, it must direct through the tunnel ip.

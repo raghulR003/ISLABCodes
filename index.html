@@ -3,41 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Copy Text from Files to Clipboard</title>
+    <title></title>
 </head>
 <body>
-    <p><a href="#" onclick="copyTextFromFile('CaesarCipher.txt')">CaesarCipher.txt</a></p>
-    <p><a href="#" onclick="copyTextFromFile('ShiftCipher.txt')">ShiftCipher.txt</a></p>
-    <p><a href="#" onclick="copyTextFromFile('Bruteforceattack.txt')">Bruteforceattack.txt</a></p>
-    <p><a href="#" onclick="copyTextFromFile('RSA.txt')">RSA.txt</a></p>
-    <p><a href="#" onclick="copyTextFromFile('DiffieHellman.txt')">DiffieHellman.txt</a></p>
-    <p><a href="#" onclick="copyTextFromFile('Maninthemiddle.txt')">Maninthemiddle.txt</a></p>
-    <p><a href="#" onclick="copyTextFromFile('HillCipher.txt')">HillCipher.txt</a></p>
-    <p><a href="#" onclick="copyTextFromFile('DoubleEncryptionandDecryption.txt')">DoubleEncryptionandDecryption.txt</a></p>
-    <p><a href="#" onclick="copyTextFromFile('Hashing.txt')">Hashing.txt</a></p>
-    <p><a href="#" onclick="copyTextFromFile('DES.txt')">DES.txt</a></p>
-    <p><a href="#" onclick="copyTextFromFile('AES.txt')">AES.txt</a></p>
-    <br><br>
-    <p><a href="#" onclick="copyTextFromFile('OPNETConfiguration.txt')">OPNET Configuration.txt</a></p>
-    <p><a href="#" onclick="copyTextFromFile('PasswordCracking.txt')">PasswordCracking.txt</a></p>
-    <p><a href="#" onclick="copyTextFromFile('WiresharkNetworkAnalysis.txt')">WiresharkNetworkAnalysis.txt</a></p>
-    <p><a href="#" onclick="copyTextFromFile('SNORTAnalysis.txt')">SNORTAnalysis.txt</a></p>
-    <p><a href="#" onclick="copyTextFromFile('SQLInjection.txt')">SQLInjection.txt</a></p>
-    <p><a href="#" onclick="copyTextFromFile('BufferOverflow.txt')">BufferOverflow.txt</a></p>
+    <fieldset>
+        <p><a href="#" onclick="copyTextFromFile('HillCipher.txt')">HillCipher</a></p>
+        <p><a href="#" onclick="copyTextFromFile('HillCipherEncryption.txt')">HillCipher - Encryption</a></p>
+        <p><a href="#" onclick="copyTextFromFile('RSA.txt')">RSA</a></p>
+        <p><a href="#" onclick="copyTextFromFile('DiffieHellman.txt')">DiffieHellman</a></p>
+        <p><a href="#" onclick="copyTextFromFile('Hashing.txt')">Hashing</a></p>
+        <p><a href="#" onclick="copyTextFromFile('SHAHashing.txt')">Hashing - SHA</a></p>
+        <p><a href="#" onclick="copyTextFromFile('DES.txt')">DES</a></p>
+        <p><a href="#" onclick="copyTextFromFile('AES.txt')">AES</a></p>
+    </fieldset>
+
+    <fieldset>
+        <p>
+            <a href="Firewall.pkz" download="Firewall.pkz">PKZ</a> | 
+            <a href="#" onclick="copyTextFromFile('PackerTracerFirewall.txt')">Packet Tracer - Firewall</a>
+        </p>
+        <p>
+            <a href="VPNFile.pkt" download="VPN.pkz">PKZ</a> | 
+             
+            <a href="#" onclick="copyTextFromFile('PackerTracerVPN.txt')">Packet Tracer - VPN</a>
+        </p>
+        <p>
+            <a href="john-1.9.0-jumbo-1-win64.7z" download="john-1.9.0-jumbo-1-win64.7z">John7z</a> |
+            <a href="#" onclick="copyTextFromFile('PasswordCracking.txt')">PasswordCracking</a>
+        </p>
+        <p><a href="#" onclick="copyTextFromFile('WiresharkNetworkAnalysis.txt')">WiresharkNetworkAnalysis</a></p>
+        <p><a href="#" onclick="copyTextFromFile('SNORTAnalysis.txt')">SNORTAnalysis</a></p>
+        <p>
+            <a href="DVWA-master.zip" download="DVWA-master.zip">DVWA ZIP</a> |
+            <a href="#" onclick="copyTextFromFile('SQLInjection.txt')">SQLInjection</a>
+        </p>
+        <p><a href="#" onclick="copyTextFromFile('BufferOverflow.txt')">BufferOverflow</a></p>
+    </fieldset>
+
+    <fieldset>
+        <p><a href="#" onclick="copyTextFromFile('CaesarCipher.txt')">CaesarCipher</a></p>
+        <p><a href="#" onclick="copyTextFromFile('ShiftCipher.txt')">ShiftCipher</a></p>
+        <p><a href="#" onclick="copyTextFromFile('Bruteforceattack.txt')">Bruteforceattack</a></p>
+        <p><a href="#" onclick="copyTextFromFile('Maninthemiddle.txt')">Maninthemiddle</a></p>
+        <p><a href="#" onclick="copyTextFromFile('DoubleEncryptionandDecryption.txt')">DoubleEncryptionandDecryption</a></p> 
+    </fieldset>
 
     <script>
         function copyTextFromFile(filename) {
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                const textArea = document.createElement('textarea');
+                textArea.value = e.target.result;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert(`Copied text from ${filename} to clipboard.`);
+            };
+
+            reader.onerror = function(error) {
+                console.error(`Error reading ${filename}:`, error);
+                alert(`Error copying text from ${filename}.`);
+            };
+
             fetch(filename)
-                .then(response => response.text())
-                .then(text => {
-                    const textArea = document.createElement("textarea");
-                    textArea.value = text;
-                    document.body.appendChild(textArea);
-                    textArea.select();
-                    document.execCommand("copy");
-                    document.body.removeChild(textArea);
-                    alert(`Copied text from ${filename} to clipboard.`);
-                })
+                .then(response => response.blob())
+                .then(blob => reader.readAsText(blob))
                 .catch(error => {
                     console.error(`Error fetching or copying text from ${filename}:`, error);
                     alert(`Error copying text from ${filename}.`);
