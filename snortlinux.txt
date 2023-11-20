@@ -1,0 +1,6 @@
+Snort
+Steps in ubuntu
+Sudo apt-get install snort
+Cd /etc/snort/rules
+snort -T -c /etc/snort/snort.conf
+Snort -A console -c /etc/snort/snort.conf
