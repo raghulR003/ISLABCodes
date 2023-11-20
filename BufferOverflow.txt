@@ -1,32 +1,124 @@
 #include <stdio.h>
 #include <string.h>
 
-int main(void)
-{
+void vulnerable_function(char *input) {
     char buff[15];
     int pass = 0;
 
-    printf("\n Enter the password : \n");
-    gets(buff); //will ask to run fgets instead of gets
+    // Vulnerable code 1: gets() - prone to buffer overflow
+    gets(buff);
 
-    if(strcmp(buff, "raghulr"))
-    {
-        printf ("\n Wrong Password \n");
+    // Vulnerable code 2: strcpy() - prone to buffer overflow
+    strcpy(buff, input);
+
+    // Vulnerable code 3: Unbounded loop writing to an array
+    for (int i = 0; i < strlen(input); i++) {
+        buff[i] = input[i];
     }
-    else
-    {
-        printf ("\n Correct Password \n");
+
+    // Vulnerable code 4: Using sprintf without buffer size check
+    sprintf(buff, "%s", input);
+
+    // Vulnerable code 5: Incorrect use of strncpy without proper termination
+    strncpy(buff, input, sizeof(buff));
+
+    if (strcmp(buff, "raghulr")) {
+        printf("\n Wrong Password \n");
+    } else {
+        printf("\n Correct Password \n");
         pass = 1;
     }
 
-    if(pass)
-    {
-       /* Now Give root or admin rights to user*/
-        printf ("\n Root privileges given to the user \n");
+    if (pass) {
+        /* Now Give root or admin rights to user*/
+        printf("\n Root privileges given to the user \n");
     }
+}
+
+int main(void) {
+    char user_input[30];
+
+    printf("\n Enter the password: \n");
+
+    // Vulnerable code 6: gets() - prone to buffer overflow
+    gets(user_input);
+
+    // Vulnerable code 7: Unbounded loop writing to an array
+    for (int i = 0; i < strlen(user_input); i++) {
+        printf("%c", user_input[i]);
+    }
+
+    vulnerable_function(user_input);
 
     return 0;
 }
 
 Run the C program, using a input like 'hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh' (text bigger than 15 for buff array size, but obviously the wrong password),
 will provide access even though it's the wrong password.
+
+Fixed code:
+
+#include <stdio.h>
+#include <string.h>
+
+void safe_function(char *input) {
+    char buff[15];
+    int pass = 0;
+
+    // Safe code 1: Use fgets() instead of gets() to prevent buffer overflow
+    fgets(buff, sizeof(buff), stdin);
+    buff[strcspn(buff, "\n")] = '\0'; // Remove the newline character
+
+    // Safe code 2: Use strncpy() with proper termination to prevent buffer overflow
+    strncpy(buff, input, sizeof(buff) - 1);
+    buff[sizeof(buff) - 1] = '\0'; // Ensure proper termination
+
+    // Safe code 3: Use a loop with bounds checking to copy characters
+    for (int i = 0; i < sizeof(buff) - 1 && i < strlen(input); i++) {
+        buff[i] = input[i];
+    }
+    buff[sizeof(buff) - 1] = '\0'; // Ensure proper termination
+
+    // Safe code 4: Use snprintf() with buffer size check
+    snprintf(buff, sizeof(buff), "%s", input);
+
+    // Safe code 5: Use strncpy() with proper termination and buffer size check
+    strncpy(buff, input, sizeof(buff) - 1);
+    buff[sizeof(buff) - 1] = '\0'; // Ensure proper termination
+
+    if (strcmp(buff, "raghulr") != 0) { // Compare result should be checked against 0
+        printf("\n Wrong Password \n");
+    } else {
+        printf("\n Correct Password \n");
+        pass = 1;
+    }
+
+    if (pass) {
+        /* Now Give root or admin rights to user*/
+        printf("\n Root privileges given to the user \n");
+    }
+}
+
+int main(void) {
+    char user_input[30];
+
+    printf("\n Enter the password: \n");
+
+    // Safe code 6: Use fgets() instead of gets() to prevent buffer overflow
+    fgets(user_input, sizeof(user_input), stdin);
+    user_input[strcspn(user_input, "\n")] = '\0'; // Remove the newline character
+
+    // Safe code 7: Use strncpy() with proper termination to prevent buffer overflow
+    strncpy(user_input, user_input, sizeof(user_input) - 1);
+    user_input[sizeof(user_input) - 1] = '\0'; // Ensure proper termination
+
+    // Safe code 8: Use a loop with bounds checking to copy characters
+    for (int i = 0; i < sizeof(user_input) - 1 && i < strlen(user_input); i++) {
+        printf("%c", user_input[i]);
+    }
+    user_input[sizeof(user_input) - 1] = '\0'; // Ensure proper termination
+
+    safe_function(user_input);
+
+    return 0;
+}

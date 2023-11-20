@@ -1,0 +1,30 @@
+1. Install SNORT.
+
+2. Make sure WinPcap is installed; if not, install it already.
+
+3. Next, unzip the files from the snortrules zip file; and replace it in the main snort directory in C.
+
+4. Now, open the snort.conf file from the etc folder, and make the following changes
+    * Change this line "ipvar HOME_NET any" to "ipvar HOME_NET <ipaddress-get ipv4 by running ipconfig in cmd"
+    * Find keyword 'rules' and find this line: Path to your rules files (this can be a relative path)
+      Change this line: ../rules to "var RULE_PATH C:\Snort\rules" and the forthcoming lines to - var SO_RULE_PATH C:\Snort\rules ; var PREPROC_RULE_PATH C:\Snort\preproc_rules
+      Same for the next set of lines as this: var WHITE_LIST_PATH C:\Snort\rules ; var BLACK_LIST_PATH C:\Snort\rules
+    * Now create two files named: "white_list.rules" and "black_list.rules" in the rules folder
+    * Search for keyword: 'logdir' to find this line: "# config logdir:", under that line, add: "config logdir:C:\Snort\log"
+    * Search for keyword: 'dynamicpreprocessor' to find this line: "# path to dynamic preprocessor libraries"
+      Change the line below to this: "dynamicpreprocessor directory C:\Snort\lib\snort_dynamicpreprocessor"  
+    * The next line: "dynamicengine /usr/local/lib/snort_dynamicengine/libsf_engine.so" is to be changed to: "dynamicengine C:\Snort\lib\snort_dynamicengine\sf_engine.dll"
+    * The next line: "dynamicdetection directory /usr/local/lib/snort_dynamicrules" is to be commented out (add # in line front)
+    * Search for keyword: 'output plugins' to find this line: "include classification.config"; change to: "include C:\Snort\etc\classification.config"
+                                         next find this line: "include reference.config"; change to: "include C:\Snort\etc\reference.config"
+    * Under the changes in previous steps, add a line below: "output alert_fast: alert.ids"  
+    * Find and replace in file all 'ipvar' to 'var', finally.
+    * Save the file.
+
+Find the list of interfaces using the command: "snort -W" (from inside the bin folder)
+
+5. To run snort, open the CMD in bin foler, then run this command: "snort -i2 -A console -c C:\Snort\etc\snort.conf -l C:\Snort\log -K ascii"
+    If error arrives as "C:\Snort\etc\snort.conf(323) => Invalid keyword '}' for server configuration." - change this line: decompress_swf { deflate lzma } \ --> #decompress_swf { deflate lzma } \ (comment out)
+
+
+
