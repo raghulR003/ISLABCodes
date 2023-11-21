@@ -1,6 +1,17 @@
 Snort
-Steps in ubuntu
-Sudo apt-get install snort
-Cd /etc/snort/rules
-snort -T -c /etc/snort/snort.conf
-Snort -A console -c /etc/snort/snort.conf
+1. Run if config and note down the inet addr of enp0s3 or eth0.
+
+Steps in ubuntu:
+1. sudo apt-get install snort
+2. cd /etc/snort/rules
+3. sudo snort -T -c /etc/snort/snort.conf (if you want, add -i enps03/eth0 as per specifications) - This is the testing guy.
+4. sudo snort -A console -c /etc/snort/snort.conf - Try pinging the ip address from Windows CMD
+   Also try this command: sudo snort -A console -q -u snort -g snort -c /etc/snort/snort.conf -i enp0s3 
+5. For the last command in 4, try nmap <ip_addr> for simulating attack.
+
+For setting up local rules:
+0. Make changes to the snort.conf by entering "sudo cat \etc\snort\snort.conf" (make changes to HOME NET variable)
+1. sudo cat /etc/snort/rules/local.rules
+2. Detect any ICMP pings - alert icmp any any -> $HOME_NET any (msg:"ICMP Ping detected!!!"; sid:100001; rev:1;) - add the previous line.
+3. In terminal run: sudo snort -q -l /var/log/snort -i enp0s3 -A console -c /etc/snort/snort.conf and type enter.
+4. To test if this is working - and perform a ping to the local net address of enps03 (try Windows CMD/Kali)
